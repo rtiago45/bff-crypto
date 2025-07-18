@@ -4,6 +4,19 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# IntelliJ project files
+.idea/
+*.iml
+
+# Compiled files
+/target/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+
 ### STS ###
 .apt_generated
 .classpath
