@@ -3,6 +3,7 @@ package com.example.bff_crypto.application;
 import com.example.bff_crypto.domain.model.Coin;
 import com.example.bff_crypto.infrastructure.client.CoinGeckoClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +24,8 @@ public class CoinService {
      *
      * @return Lista de objetos Coin
      */
+
+    @Cacheable("coins") // 🔔 Cacheamos a lista de moedas por 5 minutos
     public List<Coin> getAllCoins() {
         // 1️⃣ Pega a lista bruta da API externa
         List<Map<String, Object>> coinsRaw = coinGeckoClient.getCoinsMarkets();
@@ -31,6 +34,17 @@ public class CoinService {
         return coinsRaw.stream()
                 .map(this::mapToCoin)
                 .collect(Collectors.toList());
+    }
+
+    @Cacheable(value = "coin-details", key = "#id") // 🔔 Cache individual por ID
+    public Coin getCoinById(String id) {
+        List<Map<String, Object>> coinsRaw = coinGeckoClient.getCoinsMarkets();
+
+        return coinsRaw.stream()
+                .filter(map -> id.equals(map.get("id")))
+                .findFirst()
+                .map(this::mapToCoin)
+                .orElse(null);  // ou lançar exception 404, se quiser
     }
 
     /**

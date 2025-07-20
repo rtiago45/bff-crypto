@@ -35,7 +35,6 @@ public class CoinGeckoClient {
                 .block();
 
         log.info("Recebemos {} moedas da API CoinGecko", response != null ? response.size() : 0);
-
         return response;
     }
 }
