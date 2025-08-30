@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  datadog-agent:
+    image: gcr.io/datadoghq/agent:7
+    container_name: datadog-agent
+    environment:
+      - DD_API_KEY=${DD_API_KEY}
+      - DD_SITE=${DD_SITE:-datadoghq.com}
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+      - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks: [appnet]
+    ports:
+      - "8126:8126"        # APM
+      - "8125:8125/udp"    # DogStatsD
+
+  app:
+    build: .
+    environment:
+      - DD_AGENT_HOST=datadog-agent
+      - DD_SERVICE=bff-crypto
+      - DD_ENV=local
+      - DD_VERSION=0.1.0
+      - DD_LOGS_INJECTION=true
+      - DD_TRACE_SAMPLE_RATE=1.0
+    depends_on:
+      - datadog-agent
+    networks: [appnet]
+
+networks:
+  appnet: {}
