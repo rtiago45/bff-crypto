@@ -8,6 +8,8 @@ target/
 .idea/
 *.iml
 
+.env
+
 # Compiled files
 /target/
 
